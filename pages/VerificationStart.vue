@@ -1,7 +1,7 @@
 
 <template>
   <UContainer class="flex items-center justify-center">
-    <UCard class="rounded-lg shadow-lg max-w-md  w-[500px] h-[400px] px-5 ">
+    <UCard class="rounded-lg shadow-lg max-w-md ">
 
         <h2 class="text-xl font-bold py-2">Verification</h2>
         <div class="my-3">
@@ -59,12 +59,15 @@
 </template>
     
 <script setup>
- const handlePhoneOption=()=>{
-    //navigate to verfication phone page
+
+const handlePhoneOption=()=>{
+    navigateTo(`verification/phone`);
+
 }
 
  const handleEmailOption=()=>{
-    //navigate to verfication email page
+    navigateTo(`verification/email`);
+
  }
 
 </script>

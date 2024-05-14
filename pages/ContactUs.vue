@@ -1,7 +1,7 @@
 
 <template>
 <UContainer class="flex flex-col content-center">
-        <UCard class="w-[500px] px-5">
+        <UCard class="">
 
               <h2 class="text-xl font-bold py-2">Support</h2>
               <div class="my-3">

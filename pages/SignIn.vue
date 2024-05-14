@@ -1,22 +1,43 @@
 <template>
-  <UContainer class="flex flex-col content-center">
-      <UCard class="w-[500px]">
-          <template #header>
-            <h2 class="text-xl font-bold">Sign in</h2>
-          </template>
-          <UForm :state="formState" :schema="signInSchema" class="space-y-4" @submit="onSubmit">
-            
-            <UFormGroup name="email" label="Email" class="mt-4" required>
-              <UInput placeholder="Email" icon="i-heroicons-envelope" v-model="formState.email" />
-            </UFormGroup>
 
-            <UFormGroup name="password" label="Password" class="mt-4" required>
-              <UInput  type="password" placeholder="Password" icon="i-heroicons-lock-closed" v-model="formState.password"/>
-              <span >
-                <NuxtLink to="/Recover" class="text-[#EE7203] float-right">Forgot Password?</NuxtLink>
-              </span>
-            </UFormGroup>
-            <UButton type="submit" class="w-full mt-3" :disabled="!signInSchema.safeParse(formState).success">Sign In</UButton>
+
+  <UContainer class="flex flex-col content-center ">
+      <UCard >
+
+          <div>
+            <h2 class="text-xl font-bold">Sign in</h2>
+          </div>
+
+          <UForm :state="formState" :schema="signInSchema" class="space-y-4" @submit="onSubmit">
+          
+            <div class="my-14">
+                <UFormGroup name="email" label="Email Address" class="mt-4">
+                <UInput
+                  placeholder="michelle.rivera@example.com"
+                  icon="i-heroicons-envelope"
+                  v-model="formState.email"
+                  variant="none"
+                  class="border-b border-gray-200 dark:border-gray-700" 
+                  />
+              </UFormGroup>
+
+              <UFormGroup name="password" label="Password" class="mt-4" >
+                <UInput
+                  type="password"
+                  placeholder="Password"
+                  icon="i-heroicons-lock-closed"
+                  v-model="formState.password"
+                  variant="none"
+                  class="border-b border-gray-200 dark:border-gray-700"
+                  />
+                <span >
+                  <NuxtLink to="/Recover" class="text-[#EE7203] float-right">Forgot Password?</NuxtLink>
+                </span>
+              </UFormGroup>
+            </div>
+
+            <UButton  block color="orange" size="xl" type="submit" :disabled="!formState.email || !signInSchema.safeParse(formState).success">Cotinue</UButton>
+
           </UForm>
       </UCard>
   </UContainer>
@@ -30,6 +51,7 @@ import type { FormSubmitEvent } from '#ui/types'
 import {signInSchema} from '~/schemas/SignInFormSchema'
 import axios from 'axios';
 import { useRouter } from 'vue-router'; // Import the router
+import type { variants } from '#tailwind-config';
 
 type SignInSchema = z.output<typeof signInSchema>
 
