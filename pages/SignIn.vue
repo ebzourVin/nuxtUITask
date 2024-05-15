@@ -1,46 +1,67 @@
 <template>
+  <UCard class="flex flex-col content-center w-full h-full " :ui="{body:{padding:'px-14 py-14 sm:p-14'}}">
 
+    <div class="flex flex-row">
+      <div class="flex-col">
+          <h2 class="text-4xl font-bold">Sign in</h2>
+      </div>
+    </div>
 
-  <UContainer class="flex flex-col content-center ">
-      <UCard >
+    <div class="flex flex-row ">
+        <UForm :state="formState" :schema="signInSchema" class="flex flex-col w-full" @submit="onSubmit">
+          <div class="flex-row">
+            <div class="flex flex-col my-14">
+              <UFormGroup name="email" label="Email Address" class="">
+              <UInput
+                placeholder="michelle.rivera@example.com"
+                icon="i-heroicons-envelope"
+                v-model="formState.email"
+                variant="none"
+                size="xl"
+                class="border-b border-gray-200 dark:border-gray-700" 
+                :ui="{
+                  icon:{
+                    size:{
+                      xl:'h-5 w-5'
+                    }
+                  }
+                }"
+                />
+              </UFormGroup>
 
-          <div>
-            <h2 class="text-xl font-bold">Sign in</h2>
+              <UFormGroup name="password" label="Password" class="mt-8" >
+              <UInput
+                type="password"
+                placeholder="Password"
+                icon="i-heroicons-lock-closed"
+                v-model="formState.password"
+                variant="none"
+                size="xl"
+                :ui="{
+                  icon:{
+                    size:{
+                      xl:'h-5 w-5'
+                    }
+                  }
+                }"
+                class="border-b border-gray-200 dark:border-gray-700"
+                />
+              <span >
+                <NuxtLink to="/Recover" class="text-[#EE7203] float-right text-sm mt-4">Forgot Password?</NuxtLink>
+              </span>
+              </UFormGroup>
+              </div>
+          </div>
+          
+          <div class="flex-row">
+            <UButton  block color="orange" size="xl" type="submit" :disabled="!formState.email || !signInSchema.safeParse(formState).success">Cotinue</UButton>
           </div>
 
-          <UForm :state="formState" :schema="signInSchema" class="space-y-4" @submit="onSubmit">
+        </UForm>
+    </div>
+
           
-            <div class="my-14">
-                <UFormGroup name="email" label="Email Address" class="mt-4">
-                <UInput
-                  placeholder="michelle.rivera@example.com"
-                  icon="i-heroicons-envelope"
-                  v-model="formState.email"
-                  variant="none"
-                  class="border-b border-gray-200 dark:border-gray-700" 
-                  />
-              </UFormGroup>
-
-              <UFormGroup name="password" label="Password" class="mt-4" >
-                <UInput
-                  type="password"
-                  placeholder="Password"
-                  icon="i-heroicons-lock-closed"
-                  v-model="formState.password"
-                  variant="none"
-                  class="border-b border-gray-200 dark:border-gray-700"
-                  />
-                <span >
-                  <NuxtLink to="/Recover" class="text-[#EE7203] float-right">Forgot Password?</NuxtLink>
-                </span>
-              </UFormGroup>
-            </div>
-
-            <UButton  block color="orange" size="xl" type="submit" :disabled="!formState.email || !signInSchema.safeParse(formState).success">Cotinue</UButton>
-
-          </UForm>
-      </UCard>
-  </UContainer>
+  </UCard>
 </template>
 
 <script setup lang="ts">
