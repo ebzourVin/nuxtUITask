@@ -25,6 +25,7 @@
               <div class="flex flex-row space-x-2">
                 <UFormGroup v-for="(input, index) in state.numbers" :eager-validation="true" :key="index" :id="`input-${index}`" name="state.numbers" class="">
                     <UInput  
+                      class="text-center"
                       ref="inputRefs"
                       type="text"
                       :id="`validate-input-${index}`"
@@ -106,9 +107,11 @@
             const prevIndex = (index-1)%inputRefs.value.length;
             inputRefs.value[prevIndex].input.focus();
             }
-          } else if(event.value.trim() !==''){
-            const nextIndex = (index+1)%inputRefs.value.length;
+          } else if(event.inputType ==='insertText'){
+            if(event.target.value.trim()!==''){
+              const nextIndex = (index+1)%inputRefs.value.length;
             inputRefs.value[nextIndex].input.focus();
+            }
           }
         });
       })
