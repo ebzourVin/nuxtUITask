@@ -9,7 +9,7 @@
 
   const emit = defineEmits(['timer-finished']);
   
-  const timeInSeconds = ref(59);
+  const timeInSeconds = ref(10);
 
   const minutes = ref(Math.floor(timeInSeconds.value / 60));
   const seconds = ref(timeInSeconds.value % 60);
