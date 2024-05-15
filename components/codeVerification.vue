@@ -25,7 +25,7 @@
               <div class="flex flex-row space-x-2">
                 <UFormGroup v-for="(input, index) in state.numbers" :eager-validation="true" :key="index" :id="`input-${index}`" name="state.numbers" class="">
                     <UInput  
-                      class=""
+                      ref="inputRefs"
                       type="text"
                       :id="`validate-input-${index}`"
                       maxlength="1"
@@ -56,7 +56,6 @@
   </template>
       
   <script setup lang="ts">
-    // import { ref} from 'vue';
     import { z } from 'zod';
     import type { FormError, FormErrorEvent, FormSubmitEvent } from '#ui/types'
 
@@ -70,9 +69,7 @@
     numbers: [null, null, null, null, null, null]
   })
 
-  // const inputRefs = ref(
-  //   [null, null, null, null, null, null]
-  // )
+  const inputRefs = ref([])
 
   const schema = z.object({
       numbers: z.array(z.string()).refine(inputs => inputs.filter(value => value != null).length == 6)
@@ -101,30 +98,21 @@
   }
 
   onMounted(()=>{
-    // inputRefs.value.forEach((input,index)=>{
-    //   console.log(input);
-    // })
-    // inputRefs.value.forEach((input, index)=>{
-    //   console.log(input);
+    inputRefs.value.forEach((input,index)=>{
+      input.input.addEventListener('input',(event)=>{ 
+          if(event.inputType==='deleteContentBackward'){
 
-    //   input.value.addEventListener('input',(event)=>{
-    //     console.log(event);
-
-
-    //     if(event.key==='deleteContentBackward'){
-
-    //       if(event.target.value.trim()===''){
-    //        const prevIndex = (index-1)%state.value.length;
-    //        state.value[prevIndex].value.input.focus();
-    //       }
-    //     } else if(event.value !==''){
-    //       const nextIndex = (index+1)%state.value.length;
-    //       state.value[nextIndex].value.input.focus();
-    //     }
-    //   });
-
-    //  });
-  })
+            if(event.target.value.trim()===''){
+            const prevIndex = (index-1)%inputRefs.value.length;
+            inputRefs.value[prevIndex].input.focus();
+            }
+          } else if(event.value.trim() !==''){
+            const nextIndex = (index+1)%inputRefs.value.length;
+            inputRefs.value[nextIndex].input.focus();
+          }
+        });
+      })
+    })
   </script>
   
   <style scoped>
