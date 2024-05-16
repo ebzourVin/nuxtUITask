@@ -1,5 +1,8 @@
 <template>
-  <UCard class="flex flex-col rounded-lg shadow-lg w-full h-full space-y-2.5 justify-between" :ui="{body:{padding:'px-14 py-14 sm:p-14'}}" >
+  <UCard class="rounded-lg shadow-lg w-full h-full space-y-2.5" 
+    :ui="{
+        base:'flex flex-col h-full',
+        body:{padding:' px-14 py-14 sm:p-14'}}" >
 
         <div class="flex flex-row">
             <div class="flex-col">
@@ -17,7 +20,7 @@
                 </div>
 
                 <UButton
-                @click="handlePhoneOption"
+                @click="handleOption('phone')"
                 icon="" 
                 color="gray" 
                 size="xl"
@@ -33,7 +36,7 @@
                             </div>
                             <div class="flex flex-col items-start">
                                 <p>
-                                    +1 XXX-XXX-1050
+                                    +1 XXX-XXX-{{phone_Ending}}
                                 </p>
                                 <p class="text-sm text-gray-600">
                                     Messaging and data rates may apply.
@@ -50,7 +53,7 @@
                 </UButton>
 
                 <UButton 
-                @click="handleEmailOption"
+                @click="handleOption('email')"
                 icon="" 
                 size="xl"
                 color="gray" 
@@ -67,7 +70,7 @@
                             </div>
                             <div class="flex flex-col items-start">
                                 <p>
-                                    user@example.com
+                                   {{truncateEmail(user_email)}}
                                 </p>
                             </div>
                         </div>
@@ -81,12 +84,12 @@
                     </template>
                 </UButton>
                 <div class="flex flex-row">
-            <div class="flex flex-col">
-                <div class="text-[#D8D8D5] text-base">A message containing the verification code will be sent to the option you select.</div>
+                    <div class="flex flex-col">
+                        <div class="text-[#D8D8D5] text-base">A message containing the verification code will be sent to the option you select.</div>
+                    </div>
+                </div>
             </div>
-        </div>
-            </div>
-            
+
         </div>
 
 
@@ -94,16 +97,57 @@
 </template>
     
 <script setup>
+const phone_Ending = sessionStorage.getItem('phone_Ending');
+const user_email = sessionStorage.getItem('user_email');
+const user_password = sessionStorage.getItem('user_password');
+// const user_email = "user@example.com";
+// const user_password = "password";
+function truncateEmail(email) {
+  const atIndex = email.indexOf('@');
+  if (atIndex !== -1) {
+    const firstLetter = email[0];
+    const lastLetter = email[atIndex - 1];
+    const truncatedEmail = `${firstLetter}...${lastLetter}${email.slice(atIndex)}`;
+    return truncatedEmail;
+  }
+  return email; // If no "@" symbol found, return the original email
+}
 
-const handlePhoneOption=()=>{
-    navigateTo(`verification/phone`);
+async function callLoginApi(send_email_otp){
+    const apiUrl = 'https://vintrackers.buildonlinestaging.com/api/v1/auth/login';
+
+    const requestBody = {
+    email: user_email,
+    password: user_password,
+    send_email_otp: send_email_otp,
+    };
+
+    sessionStorage.setItem("send_email_otp", send_email_otp);
+
+    try {
+        const response = await $fetch(apiUrl,{
+            method:'POST',
+            body:requestBody,
+            headers: {
+            'Content-Type': 'application/json',
+            },
+        });
+
+    }catch(error){
+
+    }
 
 }
 
- const handleEmailOption=()=>{
-    navigateTo(`verification/email`);
+async function handleOption(pageType){
+    if(pageType==='phone')
+        await callLoginApi(false);
+    else
+        await callLoginApi(true);
 
- }
+    navigateTo(`verification/${pageType}`);
+
+}
 
 </script>
 

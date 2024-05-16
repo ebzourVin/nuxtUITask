@@ -1,14 +1,14 @@
 <template>
-    <UCard class="flex flex-col content-center w-full h-full" :ui="{body:{padding:'px-14 py-14 sm:p-14'}}">
+    <UCard class=" w-full h-full" :ui="{body:{base:'flex flex-col content-center h-full gap-4',padding:'px-14 py-14 sm:p-14'}}">
 
         <div class="flex flex-row">
             <h2 class="text-4xl font-bold">Support</h2>
         </div>
 
-        <div class="flex flex-row my-8">
+        <div class="flex flex-row">
           <div class="flex flex-col w-full">
                 <div class="flex flex-row">
-                    <div class="flex-col w-full space-y-3">
+                    <div class="flex-col w-full">
                         <p class="py-1">How can we help you?</p>
                         <UButton
                          color="white" 
@@ -32,7 +32,7 @@
           </div>
         </div>
         
-        <div class="flex flex-row my-4">
+        <div class="flex flex-row ">
             <div class="flex flex-col space-y-2.5 ">
                 <div class="flex flex-row">
                     <p class="">Frequently Asked questions</p>

@@ -1,10 +1,9 @@
-
 <template>
-    <UCard class="flex flex-col content-center w-full h-full" :ui="{body:{padding:'px-14 py-14 sm:p-14'}}">
+    <UCard class="w-full h-full" :ui="{body:{base:'h-full flex flex-col content-center',padding:'px-14 py-14 sm:p-14'}}">
   
       <div class="flex flex-row">
         <div class="flex flex-col w-full">
-          <h2 class="text-4xl font-bold py-2">Verification</h2>
+          <h2 class="text-4xl font-bold">Verification</h2>
 
         </div>
       </div>
@@ -19,35 +18,54 @@
 
       
       <div class="flex flex-row">
-        <div class=" flex flex-col items-center justify-center space-y-4">
+        <div class=" flex flex-col items-center justify-center">
           <UForm :state="state" :schema="schema" class=" flex flex-row items-baseline gap-3" @submit="handleBtnClick" @error="onError">
             <div class="flex-col">
-              <div class="flex flex-row space-x-2">
+              <div class="flex flex-row space-x-1">
                 <UFormGroup v-for="(input, index) in state.numbers" :eager-validation="true" :key="index" :id="`input-${index}`" name="state.numbers" class="">
                     <UInput  
-                      class="text-center"
                       ref="inputRefs"
+                      size="xl"
                       type="text"
                       :id="`validate-input-${index}`"
                       maxlength="1"
+                      inputClass="text-center h-[64px]"
                       v-model="state.numbers[index]"
                     />
                 </UFormGroup>
               </div>
 
               <div class=" w-full flex flex-row items-center justify-center my-12">
-                <CountdownTimer @timer-finished="showRequestAgain=true" />
-                <p v-show="showRequestAgain">Request Again?
-                  <NuxtLink @click="handleResendClick" class="text-[#EE7203] cursor-pointer">Resend  </NuxtLink>
-                  <span class="text-gray-500"> | </span>
-                  <NuxtLink v-if="pageType==='email'" to="/verification/phone" class="text-[#EE7203]">Get Via SMS</NuxtLink>
-                  <NuxtLink v-else-if="pageType==='phone'" to="/verification/email" class="text-[#EE7203]">Get Via email</NuxtLink>
-                </p>
+                
+                <div class="flex flex-col">
+                  <p v-if="invalidCred" class=" flex flex-row text-[#E32B00] justify-center ">
+                      Invalid security Code
+                    </p>
+
+                    <CountdownTimer @timer-finished="showRequestAgain=true" :key="resendCount" class="flex flex-row justify-center" />
+   
+                  <p v-show="showRequestAgain===true">Request Again?
+                    <NuxtLink @click="handleResendClick,resendCount++,showRequestAgain=false" class="text-[#EE7203] cursor-pointer">Resend  </NuxtLink>
+                    <span class="text-gray-500"> | </span>
+                    <NuxtLink v-if="pageType==='email'" to="/verification/phone" @click="resendCount++" class="text-[#EE7203]">Get Via SMS</NuxtLink>
+                    <NuxtLink v-else-if="pageType==='phone'" to="/verification/email" @click="resendCount++" class="text-[#EE7203]">Get Via Email</NuxtLink>
+                  </p>
+                </div>
               </div>
 
-                <div class="w-full flex flex-row">
-                  <UButton  block color="orange" size="xl" type="submit" :disabled="!schema.safeParse(state).success" >Cotinue</UButton>
-                </div>
+              <div v-if="showError===true" class="flex flex-row mb-12  justify-center ">
+              <UCard class="flex flex-col  border-t-8 border-[#E32B00] space-y-2.5 w-full" :ui="{body:{rounded:'rounded-lg',padding:'px-2 py-2 sm:p-2'}}">
+                <p>
+                  oops something went wrong
+                </p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+              </UCard>
+            </div>
+
+              <div class="w-full flex flex-row">
+                <UButton  block color="orange" size="xl" type="submit" :disabled="!schema.safeParse(state).success" >Cotinue</UButton>
+              </div>
+
             </div>
  
           </UForm>
@@ -61,11 +79,15 @@
     import type { FormError, FormErrorEvent, FormSubmitEvent } from '#ui/types'
 
    import CountdownTimer from '~/components/CountdownTimer.vue';
-   const showRequestAgain = ref(false);
+   const emit = defineEmits(['restart-timer']);
 
+   let showRequestAgain = ref(false);
+   const resendCount=ref(0);
+   
    const props = defineProps(['pageType']);
    const pageType = props.pageType;
-
+   let showError= false;
+   let invalidCred=false;
   const state = reactive({
     numbers: [null, null, null, null, null, null]
   })
@@ -76,18 +98,80 @@
       numbers: z.array(z.string()).refine(inputs => inputs.filter(value => value != null).length == 6)
   })
 
+  async function handleBtnClick(){
 
-    async function onSubmit () {
-  // Do something with data
-  console.log({ numbers: state.numbers })
-}
-  function handleBtnClick(){
-    console.log({
-      value: schema.safeParse(state)
-    })
+    const apiUrl = 'https://vintrackers.buildonlinestaging.com/api/v1/auth/otp';
+    const user_email = sessionStorage.getItem('user_email');
+    const user_password = sessionStorage.getItem('user_password');
+    const otp = state.numbers.toString().replaceAll(',','');
+    
+    const requestBody = {
+      email: user_email,
+      password: user_password,
+      otp: otp,
+      processing: true
+    };
+
+
+    try{
+      const response = await $fetch(apiUrl,{
+      method:'POST',
+      body:requestBody,
+      headers: {
+      'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.success) {
+      // Successful authentication
+    } else {
+      // Invalid credentials
+      invalidCred = true;
+      console.error('Invalid security Code.');
+    }
+
+    }catch(error){
+      showError=true;
+      console.error('An error occurred during authentication:', error);
+    }
+
   }
 
+    async function callLoginApi(send_email_otp){
+      
+      const apiUrl = 'https://vintrackers.buildonlinestaging.com/api/v1/auth/login';
+      const user_email = sessionStorage.getItem('user_email');
+      const user_password = sessionStorage.getItem('user_password');
 
+      const requestBody = {
+        email: user_email,
+        password: user_password,
+        send_email_otp: send_email_otp,
+      };
+
+      try {
+          const response = await $fetch(apiUrl,{
+              method:'POST',
+              body:requestBody,
+              headers: {
+              'Content-Type': 'application/json',
+              },
+          });
+
+      }catch(error){
+        showError=true;
+        console.error('An error occurred during authentication:', error);
+      }
+
+  }
+
+  async function handleResendClick(){
+    if(pageType==='phone')
+      await callLoginApi(false);
+    else
+      await callLoginApi(true);
+
+  }
   async function onError (event: FormErrorEvent) {
     console.log({ event })
     const element = document.getElementById(event.errors[0].id)
@@ -95,8 +179,7 @@
     element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 
-  function handleResendClick(){
-  }
+
 
   onMounted(()=>{
     inputRefs.value.forEach((input,index)=>{

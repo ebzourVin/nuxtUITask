@@ -7,13 +7,14 @@
   <script setup>
   import { ref} from 'vue';
 
+  //this.on('restart-timer',()=>{startTimer()})
   const emit = defineEmits(['timer-finished']);
   
-  const timeInSeconds = ref(10);
+  const timeInSeconds = ref(59);
 
   const minutes = ref(Math.floor(timeInSeconds.value / 60));
   const seconds = ref(timeInSeconds.value % 60);
-  
+  let timerInterval;
   const updateTimer = () => {
     timeInSeconds.value--;
     minutes.value = Math.floor(timeInSeconds.value / 60);
@@ -25,20 +26,14 @@
       clearInterval(timerInterval);
     }
   };
-  // const timerInterval = setInterval(updateTimer, 1000); 
+
+  function startTimer(){
+    timerInterval =  setInterval(updateTimer, 1000);
+  }
 
   onMounted(()=>{
-  });
-  // onNuxtReady(()=>{
-  //   const timerInterval = setInterval(updateTimer, 1000); ;
-  // })
-  onBeforeMount(()=>{
-    const timerInterval =  setInterval(updateTimer, 1000);
-  });
-  
-  // onUnmounted(() => {
-  //   clearInterval(timerInterval);
-  // });
+    startTimer();
+  });  
   
   </script>
   
